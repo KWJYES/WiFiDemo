@@ -9,7 +9,7 @@
     tools:context=".ClientActivity">
 
     <EditText
-        android:id="@+id/et_ip"
+        android:id="@+id/ipET"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="ip"
@@ -18,11 +18,10 @@
         android:id="@+id/btn_confirm"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="confirm"
-        android:gravity="center"
-        android:backgroundTint="#dddddd"/>
+        android:text="连接"
+        android:gravity="center" />
     <EditText
-        android:id="@+id/et_msg"
+        android:id="@+id/msgET"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:hint="msg"/>
@@ -32,9 +31,9 @@
         android:layout_height="wrap_content"
         android:text="send"
         android:gravity="center"
-        android:backgroundTint="#dddddd"/>
+        android:backgroundTint="#1E88E5"/>
     <TextView
-        android:id="@+id/tv_msg"
+        android:id="@+id/msgTV"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         />

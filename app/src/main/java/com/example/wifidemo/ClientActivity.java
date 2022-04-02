@@ -7,7 +7,6 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -17,23 +16,21 @@ import android.widget.Toast;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.Socket;
 
 public class ClientActivity extends AppCompatActivity {
 
-    private EditText et_ip;
-    private EditText et_msg;
-    private Button btn_confirm;
-    private Button btn_send;
+    private EditText ipET;
+    private EditText msgET;
+    private Button confirmBtn;
+    private Button sendBtn;
 
     private Socket mSocket;
-    private OutputStream mOutStream;
-    private InputStream mInStream;
+//    private OutputStream mOutStream;
+//    private InputStream mInStream;
     private SocketConnectThread socketConnectThread;
-    private StringBuffer sb = new StringBuffer();
-    private TextView tv_msg;
+    private StringBuffer stringBuffer = new StringBuffer();
+    private TextView msgTV;
 
     private final String TAG="WifiDemoLogClientActivity";
 
@@ -43,10 +40,9 @@ public class ClientActivity extends AppCompatActivity {
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
             if (msg.what == 1){
-                Bundle data = msg.getData();
-                sb.append(data.getString("msg"));
-                sb.append("\n");
-                tv_msg.setText(sb.toString());
+                stringBuffer.append(msg.obj);
+                stringBuffer.append("\n");
+                msgTV.setText(stringBuffer.toString());
             }
         }
     };
@@ -61,69 +57,67 @@ public class ClientActivity extends AppCompatActivity {
     }
 
     private void initView() {
-        et_ip = (EditText) findViewById(R.id.et_ip);
-        et_msg = (EditText) findViewById(R.id.et_msg);
-        btn_send =  findViewById(R.id.btn_send);
-        btn_confirm =  findViewById(R.id.btn_confirm);
-        tv_msg = (TextView) findViewById(R.id.tv_msg);
+        ipET = (EditText) findViewById(R.id.ipET);
+        msgET = (EditText) findViewById(R.id.msgET);
+        sendBtn =  findViewById(R.id.btn_send);
+        confirmBtn =  findViewById(R.id.btn_confirm);
+        msgTV = (TextView) findViewById(R.id.msgTV);
     }
 
     private void setListener() {
-        btn_send.setOnClickListener(new View.OnClickListener() {
+        sendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if(mSocket==null) {
                     Toast.makeText(ClientActivity.this, "未进行连接", Toast.LENGTH_SHORT).show();
                     return;
                 }
-                send(et_msg.getText().toString());
+                sendMessage(msgET.getText().toString());
             }
         });
-        btn_confirm.setOnClickListener(new View.OnClickListener() {
+        confirmBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 socketConnectThread.start();
-                btn_confirm.setEnabled(false);
+                confirmBtn.setEnabled(false);//连接只点一次
             }
         });
     }
 
-
+    /**
+     * 连接线程
+     */
     class SocketConnectThread extends Thread{
         public void run(){
-            Log.d(TAG, "run: ============线程启动" );
             try {
                 //指定ip地址和端口号
-                mSocket = new Socket(et_ip.getText().toString(), 1989);
-                if(mSocket != null){
-                    //获取输出流、输入流
-                    mOutStream = mSocket.getOutputStream();
-                    mInStream = mSocket.getInputStream();
-                }else {
-                    Log.d(TAG, "run: =========scoket==null");
-                }
+                mSocket = new Socket(ipET.getText().toString(), 1989);
+                //获取输出流、输入流
+//                mOutStream = mSocket.getOutputStream();
+//                mInStream = mSocket.getInputStream();
             } catch (Exception e) {
                 e.printStackTrace();
                 return;
             }
-            Log.d(TAG,"connect success========================================");
             startReader(mSocket);
         }
 
     }
 
-    public void send(final String str) {
-        if (str.length() == 0){
+    /**
+     * 发送消息
+     * @param msg
+     */
+    public void sendMessage(final String msg) {
+        if (msg.length() == 0){
             return;
         }
         new Thread() {
             @Override
             public void run() {
                 try {
-                    // socket.getInputStream()
                     DataOutputStream writer = new DataOutputStream(mSocket.getOutputStream());
-                    writer.writeUTF(str); // 写一个UTF-8的信息
-                    Log.d(TAG,"发送消息");
+                    writer.writeUTF(msg); // 写一个UTF-8的信息
                 } catch (IOException e) {
                     e.printStackTrace();
                 }
@@ -132,10 +126,9 @@ public class ClientActivity extends AppCompatActivity {
     }
 
     /**
-     * 从参数的Socket里获取最新的消息
+     * 接收消息
      */
     private void startReader(final Socket socket) {
-
         new Thread(){
             @Override
             public void run() {
@@ -144,15 +137,11 @@ public class ClientActivity extends AppCompatActivity {
                     // 获取读取流
                     reader = new DataInputStream(socket.getInputStream());
                     while (true) {
-                        Log.d(TAG,"*等待客户端输入*");
                         // 读取数据
                         String msg = reader.readUTF();
-                        Log.d(TAG,"获取到客户端的信息：=" + msg);
                         Message message = new Message();
                         message.what = 1;
-                        Bundle bundle = new Bundle();
-                        bundle.putString("msg", msg);
-                        message.setData(bundle);
+                        message.obj=msg;
                         handler.sendMessage(message);
                     }
                 } catch (IOException e) {
@@ -160,5 +149,17 @@ public class ClientActivity extends AppCompatActivity {
                 }
             }
         }.start();
+    }
+
+    @Override
+    protected void onDestroy() {
+        if(mSocket!=null){
+            try {
+                mSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        super.onDestroy();
     }
 }

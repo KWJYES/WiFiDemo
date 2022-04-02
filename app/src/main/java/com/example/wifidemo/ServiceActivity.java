@@ -12,6 +12,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 
 import java.io.DataInputStream;
@@ -22,26 +23,25 @@ import java.net.Socket;
 
 public class ServiceActivity extends AppCompatActivity {
 
-    private TextView tv_clear;
-    private TextView tv_showIP;
-    private TextView tv_ip;
-    private TextView tv_msg;
+    private Button clearBtn;
+    private Button showIPBtn;
+    private TextView ipTV;
+    private TextView msgTV;
     private ServerSocket mServerSocket;
     private Socket mSocket;
-    private StringBuffer sb = new StringBuffer();
-    private final String TAG="WifiDemoLogServiceActivity";
+    private StringBuffer stringBuffer = new StringBuffer();
+    private final String TAG = "WifiDemoLogServiceActivity";
 
 
     @SuppressLint("HandlerLeak")
-    public Handler handler = new Handler(Looper.myLooper()){
+    public Handler handler = new Handler(Looper.myLooper()) {
         @Override
         public void handleMessage(Message msg) {
             super.handleMessage(msg);
-            if (msg.what == 1){
-                Bundle data = msg.getData();
-                sb.append(data.getString("msg"));
-                sb.append("\n");
-                tv_msg.setText(sb.toString());
+            if (msg.what == 1) {
+                stringBuffer.append(msg.obj);
+                stringBuffer.append("\n");
+                msgTV.setText(stringBuffer.toString());
             }
         }
     };
@@ -54,7 +54,7 @@ public class ServiceActivity extends AppCompatActivity {
         setListener();
 
         try {
-            mServerSocket = new ServerSocket(1989);
+            mServerSocket = new ServerSocket(5000);//端口号5000
         } catch (IOException e) {
             e.printStackTrace();
         }
@@ -67,28 +67,28 @@ public class ServiceActivity extends AppCompatActivity {
      * 获得控件实例
      */
     private void initView() {
-        tv_clear = (TextView) findViewById(R.id.tv_clear);
-        tv_showIP = (TextView) findViewById(R.id.tv_showIP);
-        tv_ip = (TextView) findViewById(R.id.tv_ip);
-        tv_msg = (TextView) findViewById(R.id.tv_msg);
+        clearBtn = findViewById(R.id.clearBtn);
+        showIPBtn = findViewById(R.id.showIPBtn);
+        ipTV = findViewById(R.id.ipTV);
+        msgTV = findViewById(R.id.msgTV);
     }
 
     /**
      * 为控件设置监听
      */
     private void setListener() {
-        tv_clear.setOnClickListener(new View.OnClickListener() {
+        clearBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                sb.setLength(0);
-                tv_msg.setText("");
+                stringBuffer.setLength(0);
+                msgTV.setText("");
             }
         });
-        tv_showIP.setOnClickListener(new View.OnClickListener() {
+        showIPBtn.setOnClickListener(new View.OnClickListener() {
             @SuppressLint("SetTextI18n")
             @Override
             public void onClick(View v) {
-                tv_ip.setText(getLocalIpAddress(ServiceActivity.this)+":1989");
+                ipTV.setText(getLocalIpAddress(ServiceActivity.this) + ":5000");
             }
         });
 
@@ -99,19 +99,17 @@ public class ServiceActivity extends AppCompatActivity {
      * 连接线程
      * 得到Socket
      */
-    class SocketAcceptThread extends Thread{
+    class SocketAcceptThread extends Thread {
         @Override
         public void run() {
             try {
                 //等待客户端的连接，Accept会阻塞，直到建立连接，
-                //所以需要放在子线程中运行。
+                //所以需要放在子线程中运行
                 mSocket = mServerSocket.accept();
             } catch (IOException e) {
                 e.printStackTrace();
-                Log.d(TAG, "run: =============="+"accept error" );
                 return;
             }
-            Log.d(TAG,"accept success==================");
             //启动消息接收线程
             startReader(mSocket);
         }
@@ -122,7 +120,7 @@ public class ServiceActivity extends AppCompatActivity {
      */
     private void startReader(final Socket socket) {
 
-        new Thread(){
+        new Thread() {
             @Override
             public void run() {
                 DataInputStream reader;
@@ -130,21 +128,18 @@ public class ServiceActivity extends AppCompatActivity {
                     // 获取读取流
                     reader = new DataInputStream(socket.getInputStream());
                     while (true) {
-                        Log.d(TAG,"*等待客户端输入*");
                         // 读取数据
                         String msg = reader.readUTF();
-                        Log.d(TAG,"获取到客户端的信息：=" + msg);
+                        Log.d(TAG, "客户端的信息:" + msg);
 
                         //告知客户端消息收到
                         DataOutputStream writer = new DataOutputStream(mSocket.getOutputStream());
-                        writer.writeUTF("收到：" + msg); // 写一个UTF-8的信息
+                        writer.writeUTF("收到:" + msg); // 写一个UTF-8的信息
 
                         //发消息更新UI
                         Message message = new Message();
                         message.what = 1;
-                        Bundle bundle = new Bundle();
-                        bundle.putString("msg", msg);
-                        message.setData(bundle);
+                        message.obj=msg;
                         handler.sendMessage(message);
                     }
                 } catch (IOException e) {
@@ -156,9 +151,16 @@ public class ServiceActivity extends AppCompatActivity {
 
     @Override
     protected void onDestroy() {
-        if (mServerSocket != null){
+        if (mServerSocket != null) {
             try {
                 mServerSocket.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        if(mSocket!=null){
+            try {
+                mSocket.close();
             } catch (IOException e) {
                 e.printStackTrace();
             }

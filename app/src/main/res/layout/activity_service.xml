@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -12,35 +11,33 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
-        <TextView
-            android:id="@+id/tv_showIP"
+        <Button
+            android:id="@+id/showIPBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
             android:text="显示IP"
             android:gravity="center"
-            android:padding="15dp"
-            android:background="#dddddd"/>
-        <TextView
-            android:id="@+id/tv_clear"
+            android:padding="15dp" />
+        <Button
+            android:id="@+id/clearBtn"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            android:text="清除屏幕"
+            android:text="清屏"
             android:gravity="center"
             android:padding="15dp"
-            android:background="#dddddd"
             android:layout_marginLeft="5dp"/>
     </LinearLayout>
 
     <TextView
-        android:id="@+id/tv_ip"
+        android:id="@+id/ipTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_margin="10dp"/>
 
     <TextView
-        android:id="@+id/tv_msg"
+        android:id="@+id/msgTV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginTop="40dp"
