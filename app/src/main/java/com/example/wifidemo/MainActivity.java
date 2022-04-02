@@ -29,5 +29,13 @@ public class MainActivity extends AppCompatActivity {
                 startActivity(intent);
             }
         });
+        Button button1=findViewById(R.id.clientModeESP8266);
+        button1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent=new Intent(MainActivity.this,ESP8266ClientActivity.class);
+                startActivity(intent);
+            }
+        });
     }
 }

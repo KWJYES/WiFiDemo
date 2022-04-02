@@ -7,6 +7,7 @@
     tools:context=".MainActivity">
 
     <Button
+
         android:text="服务端"
         android:backgroundTint="@color/teal_700"
         android:id="@+id/severMode"
@@ -21,5 +22,14 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         app:layout_constraintTop_toBottomOf="@+id/severMode" />
+
+    <Button
+        android:layout_marginTop="50dp"
+        android:id="@+id/clientModeESP8266"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:backgroundTint="#3949AB"
+        android:text="基于WiFi模块ESP8266客户端"
+        app:layout_constraintTop_toBottomOf="@+id/clientMode" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

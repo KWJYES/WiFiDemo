@@ -33,6 +33,7 @@ public class ClientActivity extends AppCompatActivity {
     private InputStream mInStream;
     private SocketConnectThread socketConnectThread;
     private StringBuffer sb = new StringBuffer();
+    private TextView tv_msg;
 
     private final String TAG="WifiDemoLogClientActivity";
 
@@ -49,7 +50,6 @@ public class ClientActivity extends AppCompatActivity {
             }
         }
     };
-    private TextView tv_msg;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

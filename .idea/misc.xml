@@ -4,6 +4,7 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/AndroidStudioProgects/WiFiDemo/app/src/main/res/layout/activity_client.xml" value="0.1743659420289855" />
+        <entry key="..\:/AndroidStudioProgects/WiFiDemo/app/src/main/res/layout/activity_esp8266_client.xml" value="0.4033613316075515" />
         <entry key="..\:/AndroidStudioProgects/WiFiDemo/app/src/main/res/layout/activity_main.xml" value="0.26621847886098404" />
         <entry key="..\:/AndroidStudioProgects/WiFiDemo/app/src/main/res/layout/activity_service.xml" value="0.1743659420289855" />
       </map>
